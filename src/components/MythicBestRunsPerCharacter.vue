@@ -72,7 +72,8 @@ const dungeons = computed(() => Object.keys(props.mythicBestRunsPerCharacter));
 
                     <td v-else>&nbsp;</td>
                 </template>
-                <td style="font-size: 10px;">{{ character.last_crawled_at.split('T').join(' ') }}</td>
+                <!-- <td style="font-size: 10px;">{{ character.last_crawled_at.split('T').join(' ') }}</td> -->
+                <td><strong>{{ character.score }}</strong></td>
             </tr>
         </tbody>
     </table>

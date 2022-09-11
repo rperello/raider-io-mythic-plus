@@ -120,6 +120,7 @@ watchEffect(async () => {
         const url = createUrlFromCharacter(characterObj, [
             'mythic_plus_best_runs:all',
             'mythic_plus_alternate_runs:all',
+            'mythic_plus_scores_by_season:current'
         ]);
 
         let result;
@@ -137,7 +138,8 @@ watchEffect(async () => {
                 ...characterObj,
                 className: result.class.toLowerCase(),
                 thumbnail: result.thumbnail_url,
-                last_crawled_at: result.last_crawled_at
+                last_crawled_at: result.last_crawled_at,
+                score: Math.round(result.mythic_plus_scores_by_season?.[0].scores.all ?? 0)
             };
         }
 
