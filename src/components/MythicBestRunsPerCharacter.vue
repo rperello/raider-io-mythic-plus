@@ -23,7 +23,7 @@ const dungeons = computed(() => Object.keys(props.mythicBestRunsPerCharacter));
                 <th v-for="dungeon in dungeons" colspan="2">
                     <span style="display: inline-block;">{{ dungeon }}</span>
                 </th>
-                <th rowspan="2" style="vertical-align: bottom;">Last crawled at</th>
+                <th rowspan="2" style="vertical-align: bottom;">Score</th>
             </tr>
             <tr>
                 <template v-for="dungeon in dungeons">
