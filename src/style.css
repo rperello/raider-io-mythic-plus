@@ -133,34 +133,38 @@ table td img {
 
 .character.warlock-class,
 table td.warlock-class {
-  color: white;
-  background-color: #9482C9 !important;
+  color: #1a1a1a;
+  background-color: #9482C9;
 }
 
 .character.shaman-class,
 table td.shaman-class {
-  color: white;
-  background-color: #0070DE !important;
+  color: #1a1a1a;
+  background-color: #0070DE;
 }
 
 .character.hunter-class,
 table td.hunter-class {
-  background-color: #ABD473 !important;
+  color: #1a1a1a;
+  background-color: #ABD473;
 }
 
 .character.druid-class,
 table td.druid-class {
+  color: #1a1a1a;
   background-color: #FF7D0A !important;
 }
 
 .character.mage-class,
 table td.mage-class {
-  background-color: #69CCF0 !important;
+  color: #1a1a1a;
+  background-color: #69CCF0;
 }
 
 .character.priest-class,
 table td.priest-class {
-  background-color: #FFFFFF !important;
+  color: #1a1a1a;
+  background-color: #FFFFFF;
 }
 
 @media (prefers-color-scheme: light) {
