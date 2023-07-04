@@ -1,18 +1,15 @@
 <script setup>
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-// import HelloWorld from './components/HelloWorld.vue'
-// import RaiderTable from './components/RaiderTable.vue';
 import MythicBestRunsPerCharacter from './components/MythicBestRunsPerCharacter.vue';
 import { watchEffect, ref } from 'vue'
 
 const characters = ref([
-  'eu/zuljin/Aimara',
-  'eu/zuljin/Ciomara',
-  'eu/zuljin/Siomara',
-  'eu/zuljin/Aunara',
-  'eu/zuljin/Ilumara',
-  'eu/zuljin/Almara'
+  'eu/dunmodr/Iomara',
+  'eu/dunmodr/Aunara',
+  'eu/dunmodr/Ciomara',
+  'eu/dunmodr/Naroua',
+  'eu/dunmodr/Siomara'
 ]);
 
 function createCharacterObj (character) {
@@ -134,6 +131,7 @@ watchEffect(async () => {
         if (!(character in characterExtendedData.value)) {
             // const lastCrawledAt = new Intl.DateTimeFormat('en-GB').format(new Date(result.last_crawled_at));
             
+            console.log(result);
             characterExtendedData.value[character] = {
                 ...characterObj,
                 className: result.class.toLowerCase(),
@@ -219,7 +217,6 @@ watchEffect(async () => {
     </div> -->
 
     <MythicBestRunsPerCharacter v-if="mythicBestRunsPerCharacter != null" :mythic-best-runs-per-character="mythicBestRunsPerCharacter" :characters="characterExtendedData"></MythicBestRunsPerCharacter>
-    <!-- <RaiderTable v-if="mythicBestRuns != null" :mythic-best-runs="mythicBestRuns"></RaiderTable> -->
 </template>
 
 <style scoped>
