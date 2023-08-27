@@ -167,6 +167,12 @@ table td.priest-class {
   background-color: #FFFFFF;
 }
 
+.character.paladin-class,
+table td.paladin-class {
+  color: #1a1a1a;
+  background-color: pink;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

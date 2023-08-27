@@ -9,7 +9,9 @@ const characters = ref([
   'eu/dunmodr/Aunara',
   'eu/dunmodr/Ciomara',
   'eu/dunmodr/Naroua',
-  'eu/dunmodr/Siomara'
+  'eu/dunmodr/Siomara',
+  'eu/dunmodr/Casmara',
+  'eu/dunmodr/Naroa'
 ]);
 
 function createCharacterObj (character) {
@@ -45,68 +47,6 @@ function createUrlFromCharacter (character, extraFields = []) {
 
     return url + params.toString();
 }
-
-// watchEffect(async () => {
-//     const resultsList = [];
-//     const mythicBestRunsList = {};
-
-//     for (const character of characters.value) {
-//         const characterObj = createCharacterObj(character);
-//         const url = createUrlFromCharacter(characterObj, ['mythic_plus_highest_level_runs', 'mythic_plus_scores_by_season:current']);
-//         let result;
-
-//         try {
-//             result = await fetch(url).then(res => res.json());
-//         } catch (err) {
-//             continue;
-//         }
-
-//         if (!(character in characterExtendedData.value)) {
-//             characterExtendedData.value[character] = {
-//                 ...characterObj,
-//                 className: result.class.toLowerCase(),
-//                 thumbnail: result.thumbnail_url
-//             };
-//         }
-
-//         const resultCharacter = {
-//             ...result
-//         };
-
-//         delete resultCharacter.mythic_plus_highest_level_runs;
-//         delete resultCharacter.thumbnail_url;
-
-//         console.log(result.thumbnail_url);
-
-//         // if (!(result.mythic_plus_highest_level_runs in result)) {
-//         //     continue;
-//         // }
-
-//         resultsList.push({
-//             name: characterObj.name,
-//             thumbnail_url: result.thumbnail_url,
-//             character: characterObj,
-//             runs: result.mythic_plus_highest_level_runs
-//         });
-
-//         result.mythic_plus_highest_level_runs.forEach(run => {
-//             if (!(run.dungeon in mythicBestRunsList) || run.mythic_level >= mythicBestRunsList[run.dungeon].best_level) {
-//                 const completedAt = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeStyle: 'long' }).format(new Date(run.completed_at));
-
-//                 mythicBestRunsList[run.dungeon] = {
-//                     ...characterObj,
-//                     best_level: run.mythic_level,
-//                     completed_at: completedAt
-//                 };
-//             }
-//         });
-//     }
-
-//     results.value = resultsList;
-//     mythicBestRuns.value =  mythicBestRunsList;
-
-//     console.log({ mythicBestRunsList, characterExtendedData: characterExtendedData.value });
-// });
 
 watchEffect(async () => {
     const resultsList = [];
