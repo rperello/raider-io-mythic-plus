@@ -70,8 +70,7 @@ watchEffect(async () => {
 
         if (!(character in characterExtendedData.value)) {
             // const lastCrawledAt = new Intl.DateTimeFormat('en-GB').format(new Date(result.last_crawled_at));
-            
-            console.log(result);
+
             characterExtendedData.value[character] = {
                 ...characterObj,
                 className: result.class.toLowerCase(),
@@ -85,7 +84,6 @@ watchEffect(async () => {
             ...result
         };
 
-        // delete resultCharacter.mythic_plus_highest_level_runs;
         delete resultCharacter.mythic_plus_best_runs;
         delete resultCharacter.mythic_plus_alternate_runs;
         delete resultCharacter.thumbnail_url;
@@ -130,7 +128,6 @@ watchEffect(async () => {
 
             const dungeonModeCharacterRuns = dungeonCharacterRuns[mode];
 
-            // console.log({ run });
             if ((run.mythic_level >= dungeonModeCharacterRuns.best_level && run.num_keystone_upgrades >= dungeonModeCharacterRuns.num_keystone_upgrades)) {
                 dungeonModeCharacterRuns.best_level = run.mythic_level;
                 dungeonModeCharacterRuns.num_keystone_upgrades = run.num_keystone_upgrades;
@@ -141,22 +138,17 @@ watchEffect(async () => {
 
     results.value = resultsList;
     mythicBestRunsPerCharacter.value =  mythicBestRunsPerCharacterList;
-
-    // console.log({ resultsList, mythicBestRunsPerCharacterList, characterExtendedData: characterExtendedData.value });
 });
 </script>
 
 <template>
     <h1 style="text-align: center; font-size: 2rem; margin-bottom: 4rem;">Raider IO best mythic dungeon runs</h1>
 
-    <!-- <div style="display: flex; margin-bottom: 1rem; column-gap: 2px; font-weight: bold; padding: 2px;">
-        <div v-for="character in characterExtendedData" :key="character" class="character my-shadow" :class="`${character.className}-class`">
-            <img :src="character.thumbnail" :alt="character.name"/>
-            <span>{{ character.name }} ({{ character.realm }})</span>
-        </div>
-    </div> -->
-
-    <MythicBestRunsPerCharacter v-if="mythicBestRunsPerCharacter != null" :mythic-best-runs-per-character="mythicBestRunsPerCharacter" :characters="characterExtendedData"></MythicBestRunsPerCharacter>
+    <MythicBestRunsPerCharacter
+        v-if="mythicBestRunsPerCharacter != null"
+        :mythic-best-runs-per-character="mythicBestRunsPerCharacter"
+        :characters="characterExtendedData"
+    />
 </template>
 
 <style scoped>

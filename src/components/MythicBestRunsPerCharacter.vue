@@ -1,6 +1,8 @@
 <script setup>
 import { computed } from 'vue'
 
+const CHARACTER_BASE_URL = 'https://raider.io/characters/';
+
 const props = defineProps({
     mythicBestRunsPerCharacter: {
         type: Object,
@@ -27,8 +29,8 @@ const dungeons = computed(() => Object.keys(props.mythicBestRunsPerCharacter));
             </tr>
             <tr>
                 <template v-for="dungeon in dungeons">
-                    <th>TIR</th>
-                    <th>FOR</th>
+                    <th :title="`${dungeon} Tiránica`">TIR</th>
+                    <th :title="`${dungeon} Reforzada`">FOR</th>
                 </template>
             </tr>
         </thead>
@@ -38,13 +40,19 @@ const dungeons = computed(() => Object.keys(props.mythicBestRunsPerCharacter));
                 <td class="text-left" :class="`${character.className}-class`">
                     <div style="display: flex; align-items: center; column-gap: 8px;">
                         <img :src="character.thumbnail" :alt="character.name"/>
-                        <span>
+                        <a
+                            :href="`${CHARACTER_BASE_URL}${character.id}`"
+                            target="_blank"
+                        >
                             <strong>{{ character.name }}&nbsp;({{ character.realm }})</strong>
-                        </span>
+                        </a>
                     </div>
                 </td>
                 <template v-for="(dungeon, id) in mythicBestRunsPerCharacter" :key="dungeon">
-                    <td v-if="character.id in dungeon && 'Tyrannical' in dungeon[character.id]">
+                    <td
+                        v-if="character.id in dungeon && 'Tyrannical' in dungeon[character.id]"
+                        :title="dungeon.completed_at"
+                    >
                         <div style="display: flex; align-items: center; column-gap: 2px;">
                             <span style="margin-right: 4px;">
                                 <strong>{{ dungeon[character.id].Tyrannical.best_level }}</strong>
@@ -58,7 +66,10 @@ const dungeons = computed(() => Object.keys(props.mythicBestRunsPerCharacter));
 
                     <td v-else>&nbsp;</td>
 
-                    <td v-if="character.id in dungeon && 'Fortified' in dungeon[character.id]">
+                    <td
+                        v-if="character.id in dungeon && 'Fortified' in dungeon[character.id]"
+                        :title="dungeon.completed_at"
+                    >
                         <div style="display: flex; align-items: center; column-gap: 2px;">
                             <span style="margin-right: 4px;">
                                 <strong>{{ dungeon[character.id].Fortified.best_level }}</strong>
@@ -72,7 +83,6 @@ const dungeons = computed(() => Object.keys(props.mythicBestRunsPerCharacter));
 
                     <td v-else>&nbsp;</td>
                 </template>
-                <!-- <td style="font-size: 10px;">{{ character.last_crawled_at.split('T').join(' ') }}</td> -->
                 <td><strong>{{ character.score }}</strong></td>
             </tr>
         </tbody>
