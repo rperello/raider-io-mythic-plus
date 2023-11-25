@@ -1,8 +1,6 @@
 <script setup>
 import { computed } from 'vue'
 
-const CHARACTER_BASE_URL = 'https://raider.io/characters/';
-
 const props = defineProps({
     mythicBestRunsPerCharacter: {
         type: Object,
@@ -41,7 +39,7 @@ const dungeons = computed(() => Object.keys(props.mythicBestRunsPerCharacter));
                     <div style="display: flex; align-items: center; column-gap: 8px;">
                         <img :src="character.thumbnail" :alt="character.name"/>
                         <a
-                            :href="`${CHARACTER_BASE_URL}${character.id}`"
+                            :href="character.profile_url"
                             target="_blank"
                         >
                             <strong>{{ character.name }}&nbsp;({{ character.realm }})</strong>
@@ -83,7 +81,10 @@ const dungeons = computed(() => Object.keys(props.mythicBestRunsPerCharacter));
 
                     <td v-else>&nbsp;</td>
                 </template>
-                <td><strong>{{ character.score }}</strong></td>
+                <td>
+                    <strong v-if="character.score > 0" :style="{ color: character.scoreColor }">{{ character.score }}</strong>
+                    <span v-else>&nbsp;</span>
+                </td>
             </tr>
         </tbody>
     </table>

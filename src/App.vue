@@ -28,7 +28,6 @@ function createCharacterObj (character) {
 const characterExtendedData = ref({});
 
 const results = ref(null);
-// const mythicBestRuns = ref(null);
 const mythicBestRunsPerCharacter = ref(null);
 
 function createUrlFromCharacter (character, extraFields = []) {
@@ -48,9 +47,22 @@ function createUrlFromCharacter (character, extraFields = []) {
     return url + params.toString();
 }
 
+function getScoreColor(scoreValue, colors) {
+    const color = colors.find(({ score, rgbHex }) => score <= scoreValue);
+
+    return color?.rgbHex ?? 'white';
+}
+
 watchEffect(async () => {
     const resultsList = [];
     const mythicBestRunsPerCharacterList = {};
+    let colors = [];
+
+    try {
+        colors = await fetch('https://raider.io/api/v1/mythic-plus/score-tiers').then(res => res.json());
+    } catch(err) {
+        console.error(err);
+    }
 
     for (const character of characters.value) {
         const characterObj = createCharacterObj(character);
@@ -69,14 +81,16 @@ watchEffect(async () => {
         }
 
         if (!(character in characterExtendedData.value)) {
-            // const lastCrawledAt = new Intl.DateTimeFormat('en-GB').format(new Date(result.last_crawled_at));
+            const score = Math.round(result.mythic_plus_scores_by_season?.[0].scores.all ?? 0);
 
             characterExtendedData.value[character] = {
                 ...characterObj,
                 className: result.class.toLowerCase(),
                 thumbnail: result.thumbnail_url,
+                profile_url: result.profile_url,
                 last_crawled_at: result.last_crawled_at,
-                score: Math.round(result.mythic_plus_scores_by_season?.[0].scores.all ?? 0)
+                score: Math.round(result.mythic_plus_scores_by_season?.[0].scores.all ?? 0),
+                scoreColor: getScoreColor(score, colors) 
             };
         }
 
@@ -87,6 +101,7 @@ watchEffect(async () => {
         delete resultCharacter.mythic_plus_best_runs;
         delete resultCharacter.mythic_plus_alternate_runs;
         delete resultCharacter.thumbnail_url;
+        delete resultCharacter.profile_url;
 
         const allRuns = result.mythic_plus_best_runs.concat(result.mythic_plus_alternate_runs)
 
@@ -94,6 +109,7 @@ watchEffect(async () => {
             name: characterObj.name,
             thumbnail_url: result.thumbnail_url,
             character: characterObj,
+            profile_url: result.profile_url,
             // runs: result.mythic_plus_highest_level_runs
             runs: allRuns
         });
