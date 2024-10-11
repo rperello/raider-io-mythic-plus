@@ -6,12 +6,11 @@ import { watchEffect, ref } from 'vue'
 
 const characters = ref([
   'eu/dunmodr/Iomara',
+  'eu/dunmodr/Naroa',
   'eu/dunmodr/Aunara',
   'eu/dunmodr/Ciomara',
   'eu/dunmodr/Naroua',
-  'eu/dunmodr/Siomara',
-  'eu/dunmodr/Casmara',
-  'eu/dunmodr/Naroa'
+  'eu/dunmodr/Siomara'
 ]);
 
 function createCharacterObj (character) {
@@ -48,7 +47,7 @@ function createUrlFromCharacter (character, extraFields = []) {
 }
 
 function getScoreColor(scoreValue, colors) {
-    const color = colors.find(({ score, rgbHex }) => score <= scoreValue);
+    const color = colors.find(({ score }) => score <= scoreValue);
 
     return color?.rgbHex ?? 'white';
 }
@@ -99,18 +98,16 @@ watchEffect(async () => {
         };
 
         delete resultCharacter.mythic_plus_best_runs;
-        delete resultCharacter.mythic_plus_alternate_runs;
         delete resultCharacter.thumbnail_url;
         delete resultCharacter.profile_url;
 
-        const allRuns = result.mythic_plus_best_runs.concat(result.mythic_plus_alternate_runs)
+        const allRuns = result.mythic_plus_best_runs;
 
         resultsList.push({
             name: characterObj.name,
             thumbnail_url: result.thumbnail_url,
             character: characterObj,
             profile_url: result.profile_url,
-            // runs: result.mythic_plus_highest_level_runs
             runs: allRuns
         });
 
@@ -122,33 +119,26 @@ watchEffect(async () => {
                 mythicBestRunsPerCharacterList[run.dungeon] = {};
             }
 
-            const mode = run.affixes.filter((affix) => ['Tyrannical', 'Fortified'].includes(affix.name)).map(affix => affix.name);
-            run.mode = mode;
-
             const dungeonBestRuns = mythicBestRunsPerCharacterList[run.dungeon];
 
             if (!(characterId in dungeonBestRuns)) {
                 dungeonBestRuns[characterId] = {};
             }
 
-            const dungeonCharacterRuns = dungeonBestRuns[characterId];
+            const dungeonCharacterRuns = {
+                ...characterObj,
+                best_level: run.mythic_level,
+                num_keystone_upgrades: run.num_keystone_upgrades,
+                completed_at: completedAt
+            };
 
-            if (!(mode in dungeonCharacterRuns)) {
-                dungeonCharacterRuns[mode] = {
-                    ...characterObj,
-                    best_level: run.mythic_level,
-                    num_keystone_upgrades: run.num_keystone_upgrades,
-                    completed_at: completedAt
-                };
+            if ((run.mythic_level >= dungeonCharacterRuns.best_level && run.num_keystone_upgrades >= dungeonCharacterRuns.num_keystone_upgrades)) {
+                dungeonCharacterRuns.best_level = run.mythic_level;
+                dungeonCharacterRuns.num_keystone_upgrades = run.num_keystone_upgrades;
+                dungeonCharacterRuns.completed_at = completedAt;
             }
 
-            const dungeonModeCharacterRuns = dungeonCharacterRuns[mode];
-
-            if ((run.mythic_level >= dungeonModeCharacterRuns.best_level && run.num_keystone_upgrades >= dungeonModeCharacterRuns.num_keystone_upgrades)) {
-                dungeonModeCharacterRuns.best_level = run.mythic_level;
-                dungeonModeCharacterRuns.num_keystone_upgrades = run.num_keystone_upgrades;
-                dungeonModeCharacterRuns.completed_at = completedAt;
-            }
+            dungeonBestRuns[characterId] = dungeonCharacterRuns;
         });
     }
 
