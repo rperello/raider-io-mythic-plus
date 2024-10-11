@@ -20,23 +20,17 @@ const dungeons = computed(() => Object.keys(props.mythicBestRunsPerCharacter));
         <thead>
             <tr>
                 <th class="text-left" rowspan="2" style="vertical-align: bottom;">Character</th>
-                <th v-for="dungeon in dungeons" colspan="2">
+                <th v-for="dungeon in dungeons">
                     <span style="display: inline-block;">{{ dungeon }}</span>
                 </th>
                 <th rowspan="2" style="vertical-align: bottom;">Score</th>
-            </tr>
-            <tr>
-                <template v-for="dungeon in dungeons">
-                    <th :title="`${dungeon} Tiránica`">TIR</th>
-                    <th :title="`${dungeon} Reforzada`">FOR</th>
-                </template>
             </tr>
         </thead>
 
         <tbody>
             <tr v-for="character in characters">
                 <td class="text-left" :class="`${character.className}-class`">
-                    <div style="display: flex; align-items: center; column-gap: 8px;">
+                    <div style="display: flex; justify-content: center; align-items: center; column-gap: 8px;">
                         <img :src="character.thumbnail" :alt="character.name"/>
                         <a
                             :href="character.profile_url"
@@ -48,32 +42,15 @@ const dungeons = computed(() => Object.keys(props.mythicBestRunsPerCharacter));
                 </td>
                 <template v-for="(dungeon, id) in mythicBestRunsPerCharacter" :key="dungeon">
                     <td
-                        v-if="character.id in dungeon && 'Tyrannical' in dungeon[character.id]"
+                        v-if="character.id in dungeon"
                         :title="dungeon.completed_at"
                     >
-                        <div style="display: flex; align-items: center; column-gap: 2px;">
+                        <div style="display: flex; justify-content: center; align-items: center; column-gap: 2px;">
                             <span style="margin-right: 4px;">
-                                <strong>{{ dungeon[character.id].Tyrannical.best_level }}</strong>
+                                <strong>{{ dungeon[character.id].best_level }}</strong>
                             </span>
 
-                            <span v-for="star in new Array(dungeon[character.id].Tyrannical.num_keystone_upgrades).fill('⭐')" style="font-size: 8px;">
-                                {{ star }}
-                            </span>
-                        </div>
-                    </td>
-
-                    <td v-else>&nbsp;</td>
-
-                    <td
-                        v-if="character.id in dungeon && 'Fortified' in dungeon[character.id]"
-                        :title="dungeon.completed_at"
-                    >
-                        <div style="display: flex; align-items: center; column-gap: 2px;">
-                            <span style="margin-right: 4px;">
-                                <strong>{{ dungeon[character.id].Fortified.best_level }}</strong>
-                            </span>
-
-                            <span v-for="star in new Array(dungeon[character.id].Fortified.num_keystone_upgrades).fill('⭐')" style="font-size: 8px;">
+                            <span v-for="star in new Array(dungeon[character.id].num_keystone_upgrades).fill('⭐')" style="font-size: 8px;">
                                 {{ star }}
                             </span>
                         </div>
