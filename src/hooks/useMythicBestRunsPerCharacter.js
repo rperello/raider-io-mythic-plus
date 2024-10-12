@@ -89,14 +89,6 @@ export function useMythicBestRunsPerCharacter(characters) {
     
             const allRuns = result.mythic_plus_best_runs;
     
-            // resultsList.push({
-            //     name: characterObj.name,
-            //     thumbnail_url: result.thumbnail_url,
-            //     character: characterObj,
-            //     profile_url: result.profile_url,
-            //     runs: allRuns
-            // });
-    
             allRuns.forEach(run => {
                 const characterId = characterObj.id;
                 const completedAt = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeStyle: 'long' }).format(new Date(run.completed_at));
