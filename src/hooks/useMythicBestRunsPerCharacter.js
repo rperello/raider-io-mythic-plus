@@ -1,32 +1,5 @@
-import { watchEffect, ref } from 'vue'
-
-function createCharacterObj (character) {
-    const [region, realm, name] = character.split('/');
-
-    return {
-        id: character,
-        region,
-        realm,
-        name
-    };
-}
-
-function createUrlFromCharacter (character, extraFields = []) {
-    const url = 'https://raider.io/api/v1/characters/profile?';
-    const params = new URLSearchParams();
-
-    for (const param of Object.keys(character)) {
-        if (!['id'].includes(param)) {
-            params.set(param, character[param]);
-        }
-    }
-
-    if (extraFields.length) {
-        params.set('fields', extraFields.join(','));
-    }
-
-    return url + params.toString();
-}
+import { inject, watchEffect, ref } from 'vue'
+import { parseCharacter } from '../utils/character';
 
 function getScoreColor(scoreValue, colors) {
     const color = colors.find(({ score }) => score <= scoreValue);
@@ -34,34 +7,40 @@ function getScoreColor(scoreValue, colors) {
     return color?.rgbHex ?? 'white';
 }
 
-export function useMythicBestRunsPerCharacter(characters) {
+export function useMythicBestRunsPerCharacter(data) {
+    const raiderApi = inject('raiderApi');
+
     const characterExtendedData = ref({});
     const mythicBestRunsPerCharacter = ref(null);
 
     watchEffect(async () => {
-        // const resultsList = [];
+        const { characters } = data;
+
+        if (characters.length === 0) {
+            return;
+        }
+
         const mythicBestRunsPerCharacterList = {};
         let colors = [];
     
         try {
-            colors = await fetch('https://raider.io/api/v1/mythic-plus/score-tiers').then(res => res.json());
+            colors = await raiderApi.getMythicPlusScoreTiersColors();
         } catch(err) {
             console.error(err);
         }
     
-        for (const character of characters.value) {
-            const characterObj = createCharacterObj(character);
-            const url = createUrlFromCharacter(characterObj, [
-                'mythic_plus_best_runs:all',
-                'mythic_plus_alternate_runs:all',
-                'mythic_plus_scores_by_season:current'
-            ]);
-    
+        for (const character of characters) {
+            const parsedCharacter = parseCharacter(character);
+
             let result;
-    
+
             try {
-                result = await fetch(url).then(res => res.json());
-            } catch (err) {
+                result = await raiderApi.getCharacterProfile(parsedCharacter, [
+                    'mythic_plus_best_runs:all',
+                    'mythic_plus_alternate_runs:all',
+                    'mythic_plus_scores_by_season:current'
+                ]);
+            } catch (error) {
                 continue;
             }
     
@@ -69,7 +48,8 @@ export function useMythicBestRunsPerCharacter(characters) {
                 const score = Math.round(result.mythic_plus_scores_by_season?.[0].scores.all ?? 0);
     
                 characterExtendedData.value[character] = {
-                    ...characterObj,
+                    id: character,
+                    ...parsedCharacter,
                     className: result.class.toLowerCase(),
                     thumbnail: result.thumbnail_url,
                     profile_url: result.profile_url,
@@ -90,7 +70,6 @@ export function useMythicBestRunsPerCharacter(characters) {
             const allRuns = result.mythic_plus_best_runs;
     
             allRuns.forEach(run => {
-                const characterId = characterObj.id;
                 const completedAt = new Intl.DateTimeFormat('en-GB', { dateStyle: 'full', timeStyle: 'long' }).format(new Date(run.completed_at));
     
                 if (!(run.dungeon in mythicBestRunsPerCharacterList)) {
@@ -99,12 +78,13 @@ export function useMythicBestRunsPerCharacter(characters) {
     
                 const dungeonBestRuns = mythicBestRunsPerCharacterList[run.dungeon];
     
-                if (!(characterId in dungeonBestRuns)) {
-                    dungeonBestRuns[characterId] = {};
+                if (!(character in dungeonBestRuns)) {
+                    dungeonBestRuns[character] = {};
                 }
     
                 const dungeonCharacterRuns = {
-                    ...characterObj,
+                    id: character,
+                    ...parsedCharacter,
                     best_level: run.mythic_level,
                     num_keystone_upgrades: run.num_keystone_upgrades,
                     completed_at: completedAt
@@ -116,7 +96,7 @@ export function useMythicBestRunsPerCharacter(characters) {
                     dungeonCharacterRuns.completed_at = completedAt;
                 }
     
-                dungeonBestRuns[characterId] = dungeonCharacterRuns;
+                dungeonBestRuns[character] = dungeonCharacterRuns;
             });
         }
 

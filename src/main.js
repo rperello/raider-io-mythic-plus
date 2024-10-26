@@ -1,5 +1,11 @@
 import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
+import { RaiderApi } from './services/RaiderApi'
+import { Persistence } from './services/Persistence'
 
-createApp(App).mount('#app')
+const app = createApp(App)
+
+app.provide('raiderApi', new RaiderApi())
+app.provide('persistence', new Persistence())
+app.mount('#app')

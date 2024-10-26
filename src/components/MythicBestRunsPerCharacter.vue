@@ -30,7 +30,7 @@ const dungeons = computed(() => Object.keys(props.mythicBestRunsPerCharacter));
         <tbody>
             <tr v-for="character in characters">
                 <td class="text-left" :class="`${character.className}-class`">
-                    <div style="display: flex; justify-content: center; align-items: center; column-gap: 8px;">
+                    <div style="display: flex; justify-content: start; align-items: center; column-gap: 8px;">
                         <img :src="character.thumbnail" :alt="character.name"/>
                         <a
                             :href="character.profile_url"
