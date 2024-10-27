@@ -10,7 +10,7 @@ export class Character {
     }
 
 
-    static serialize({ region, realm, name }) {
+    static stringify({ region, realm, name }) {
         return `${region}/${realm?.replace(/\s/, '').toLowerCase()}/${name}`;
     }
 }

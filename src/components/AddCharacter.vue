@@ -33,7 +33,7 @@ watchEffect(() => {
     const { region, realm } = props;
 
     if (region && realm) {
-        character.value = Character.serialize({ region, realm, name: '' });
+        character.value = Character.stringify({ region, realm, name: '' });
     }
 });
 
@@ -82,7 +82,7 @@ async function addCharacter() {
 
         const { region, realm } = profile;
 
-        character.value = Character.serialize({ region, realm, name: '' });
+        character.value = Character.stringify({ region, realm, name: '' });
     }
 }
 </script>

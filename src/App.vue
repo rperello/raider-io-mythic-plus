@@ -5,8 +5,10 @@ import { computed, inject, reactive, ref, watchEffect } from 'vue'
 import AddCharacter from './components/AddCharacter.vue';
 import CharacterBadge from './components/CharacterBadge.vue'
 import MythicBestRunsPerCharacter from './components/MythicBestRunsPerCharacter.vue';
+import ImportDropZone from './components/ImportDropZone.vue';
 import { Character } from './classes/character';
 
+const raiderApi = inject('raiderApi');
 const persistence = inject('persistence');
 const data = reactive({
     characters: persistence.getItem('characters', [])
@@ -61,7 +63,7 @@ const alreadyExistingCharacters = computed(() => {
     const characters = data.characters.slice(0);
 
     for (const characterProfile of provisionalCharacterProfiles) {
-        const character = Character.serialize(characterProfile);
+        const character = Character.stringify(characterProfile);
     
         characters.push(character.toLowerCase());
     }
@@ -71,7 +73,7 @@ const alreadyExistingCharacters = computed(() => {
 
 function addCharacterProfile(characterProfile) {
     if (data.characters.length > 0) {
-        const newCharacter = Character.serialize(characterProfile);
+        const newCharacter = Character.stringify(characterProfile);
         const alreadyExistingCharacter = data.characters.includes(newCharacter.toLowerCase());
 
         if (!alreadyExistingCharacter) {
@@ -90,7 +92,7 @@ function addNewCharacters() {
     const newCharacters = [];
 
     for (const characterProfile of provisionalCharacterProfiles) {
-        const character = Character.serialize(characterProfile);
+        const character = Character.stringify(characterProfile);
     
         newCharacters.push(character);
     }
@@ -116,6 +118,31 @@ function removeCharacter(characterId) {
         }
 
         provisionalCharacterProfiles.splice(characterIndex, 1);
+    }
+}
+
+async function importCharacters(importedCharacters) {
+    const promises = [];
+
+    for (const character of importedCharacters) {
+        if (alreadyExistingCharacters.value.includes(character.toLowerCase())) {
+            continue;
+        }
+
+        const parsedCharacter = Character.parse(character);
+        const promise = raiderApi.getCharacterProfile(parsedCharacter);
+
+        promises.push(promise);
+    }
+
+    const results = await Promise.allSettled(promises);
+
+    for (const { status, value } of results) {
+        if (status === 'rejected' || 'error' in value) {
+            continue;
+        }
+
+        provisionalCharacterProfiles.push(value);
     }
 }
 </script>
@@ -148,37 +175,40 @@ function removeCharacter(characterId) {
             </div>
         </div>
 
-        <div v-else>
-            <p><strong>No characters. Please, add one</strong></p>
+        <div v-else style="display: inline-flex; flex-direction: column; align-items: stretch; row-gap: 1em;">
+            <p><strong>No characters. Please, add one via input or drop file with multiple</strong></p>
 
-            <div style="display: flex; justify-content: center; padding: 0.5rem;">
-                <AddCharacter
-                    :existingCharacters="alreadyExistingCharacters"
-                    :region="lastRegion"
-                    :realm="lastRealm"
-                    @addedCharacter="addCharacterProfile"
-                />
-            </div>
+            <div style="display: flex; flex-direction: row; column-gap: 1em;">
+                <ImportDropZone @importedCharacters="importCharacters"/>
 
-            <div
-                v-if="provisionalCharacterProfiles.length > 0"
-                style="display: inline-flex; align-items: end; flex-direction: column; row-gap: 0.5em; margin: 1em 0 2em; padding: 1em; background-color: #fff5; border-radius: 5px;"
-            >
                 <div>
-                    <button @click="addNewCharacters">Confirm</button>
-                </div>
-
-                <div
-                    style="display: inline-flex; align-items: center; flex-direction: column; row-gap: 0.5em; margin: 0.5em 0;"
-                >
-                    <div
-                        v-for="character in provisionalCharacterProfiles"
-                    >
-                        <CharacterBadge
-                            :character="character"
-                            :enableRemove="true"
-                            @removeCharacter="removeCharacter"
+                    <div style="display: flex; justify-content: center; padding: 0.5rem;">
+                        <AddCharacter
+                            :existingCharacters="alreadyExistingCharacters"
+                            :region="lastRegion"
+                            :realm="lastRealm"
+                            @addedCharacter="addCharacterProfile"
                         />
+                    </div>
+
+                    <div
+                        v-if="provisionalCharacterProfiles.length > 0"
+                        style="display: inline-flex; align-items: stretch; flex-direction: column; row-gap: 0.5em; margin: 1em 0 2em; padding: 1em; background-color: #fff5; border-radius: 5px;"
+                    >
+                        <div style="text-align: right;">
+                            <button @click="addNewCharacters">Confirm</button>
+                        </div>
+
+                        <div
+                            style="display: flex; flex-direction: column; align-items: center; row-gap: 0.5em; margin: 0.5em 0;"
+                        >
+                            <CharacterBadge
+                                v-for="character in provisionalCharacterProfiles"
+                                :character="character"
+                                :enableRemove="true"
+                                @removeCharacter="removeCharacter"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
