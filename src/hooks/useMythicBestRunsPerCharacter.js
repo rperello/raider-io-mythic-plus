@@ -1,5 +1,5 @@
 import { inject, watchEffect, ref } from 'vue'
-import { parseCharacter } from '../utils/character';
+import { Character } from '../classes/character';
 
 function getScoreColor(scoreValue, colors) {
     const color = colors.find(({ score }) => score <= scoreValue);
@@ -11,12 +11,14 @@ export function useMythicBestRunsPerCharacter(data) {
     const raiderApi = inject('raiderApi');
 
     const characterExtendedData = ref({});
-    const mythicBestRunsPerCharacter = ref(null);
+    const mythicBestRunsPerCharacter = ref({});
 
     watchEffect(async () => {
         const { characters } = data;
 
         if (characters.length === 0) {
+            characterExtendedData.value = {};
+            mythicBestRunsPerCharacter.value = {};
             return;
         }
 
@@ -28,9 +30,21 @@ export function useMythicBestRunsPerCharacter(data) {
         } catch(err) {
             console.error(err);
         }
+
+        // TODO: Preserve as soft deleted for later recovery?
+        // Remove characters not listed in new characters list
+        const previousCharacters = Object.keys(characterExtendedData.value);
+
+        for (const previousCharacter of previousCharacters) {
+            if (characters.includes(previousCharacter)) {
+                continue;
+            }
+
+            delete characterExtendedData.value[previousCharacter];
+        }
     
         for (const character of characters) {
-            const parsedCharacter = parseCharacter(character);
+            const parsedCharacter = Character.parse(character);
 
             let result;
 
@@ -49,13 +63,9 @@ export function useMythicBestRunsPerCharacter(data) {
     
                 characterExtendedData.value[character] = {
                     id: character,
-                    ...parsedCharacter,
-                    className: result.class.toLowerCase(),
-                    thumbnail: result.thumbnail_url,
-                    profile_url: result.profile_url,
-                    last_crawled_at: result.last_crawled_at,
+                    ...result,
                     score: Math.round(result.mythic_plus_scores_by_season?.[0].scores.all ?? 0),
-                    scoreColor: getScoreColor(score, colors) 
+                    scoreColor: getScoreColor(score, colors)
                 };
             }
     

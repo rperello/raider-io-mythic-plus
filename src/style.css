@@ -4,7 +4,7 @@
   line-height: 24px;
   font-weight: 400;
 
-  color-scheme: light dark;
+  color-scheme: dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 
@@ -17,17 +17,13 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a {
-  font-weight: 500;
   color: #222;
   text-decoration: inherit;
 }
+
 a:hover {
   color: #111;
+  text-decoration: underline orangered;
 }
 
 body {
@@ -40,32 +36,46 @@ body {
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
+  font-family: "Texturina", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
 }
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-weight: 700;
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  line-height: 1.2;
+  color: #180202;
 }
 
 button {
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 0 solid transparent;
   padding: 0.6em 1.2em;
   font-size: 1em;
-  font-weight: 500;
+  font-weight: 700;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: orangered;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  color: white;
 }
 
 button:hover {
-  border-color: #646cff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5) inset;
 }
 
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+button:disabled {
+  background-color: #555;
+  color: #ccc;
 }
 
 input {
@@ -79,6 +89,11 @@ input {
   transition: border-color 0.25s;
 }
 
+input:focus,
+input:focus-visible {
+  outline: 1px auto orangered;
+}
+
 .card {
   padding: 2em;
 }
@@ -86,17 +101,23 @@ input {
 #app {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 
+main {
+  background-color: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 30px #FF450055 inset, 0 0 30px #FFA50044;
+  padding: 3em 2em 2em;
+  overflow-x: auto;
+}
+
 table {
-  box-shadow: 0 40px 60px rgba(255, 255, 255, 0.1);
-  /* border-spacing: 1px; */
+  box-shadow: 0 0 40px #ff450084;
+  color: white;
+  margin-top: 1em;
 }
 
 table thead {
-  text-transform: uppercase;
   font-size: 12px;
 }
 
@@ -116,21 +137,6 @@ table td {
   vertical-align: middle;
 }
 
-.character {
-  background-color: #1a1a1a;
-  display: flex;
-  align-items: center;
-  /* column-gap: 0.75rem; */
-}
-
-.character span {
-  padding: 8px 16px;
-}
-
-.character img {
-  width: 42px;
-}
-
 .text-left {
   text-align: left;
 }
@@ -139,79 +145,11 @@ table td {
   box-shadow: 0 40px 60px rgba(255, 255, 255, 0.1);
 }
 
-table td img {
-  width: 42px;
+td.transparent-background {
+  background-color: transparent;
+  padding: 0;
 }
 
-.character.warlock-class,
-table td.warlock-class {
-  color: #1a1a1a;
-  background-color: #9482C9;
-}
-
-.character.shaman-class,
-table td.shaman-class {
-  color: #1a1a1a;
-  background-color: #0070DE;
-}
-
-.character.hunter-class,
-table td.hunter-class {
-  color: #1a1a1a;
-  background-color: #ABD473;
-}
-
-.character.druid-class,
-table td.druid-class {
-  color: #1a1a1a;
-  background-color: #FF7D0A !important;
-}
-
-.character.mage-class,
-table td.mage-class {
-  color: #1a1a1a;
-  background-color: #69CCF0;
-}
-
-.character.priest-class,
-table td.priest-class {
-  color: #1a1a1a;
-  background-color: #FFFFFF;
-}
-
-.character.paladin-class,
-table td.paladin-class {
-  color: #1a1a1a;
-  background-color: pink;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #e4e4e4;
-  }
-
-  a:hover {
-    color: #747bff;
-  }
-
-  button {
-    background-color: #bbb;
-  }
-
-  table {
-    box-shadow: 0 40px 60px rgba(0, 0, 0, 0.1);
-  }
-  
-  table th {
-    background-color: white;
-  }
-  
-  table td {
-    background-color: #f4f4f4;
-  }
-
-  .character {
-    background-color: white;
-  }
+.orange-glow {
+  text-shadow: 0 0 2px orangered, 0 0 10px orange, 0 0 50px orangered;
 }

@@ -9,7 +9,7 @@ export class Persistence {
         try {
             return JSON.parse(textValue);
         } catch (error) {
-            return defaultValue;
+            return textValue ?? defaultValue;
         }
     }
 
