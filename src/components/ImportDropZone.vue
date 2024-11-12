@@ -1,22 +1,28 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
+
+type Characters = Array<string>;
 
 const emit = defineEmits(['importedCharacters']);
 
-const importingErrorMessages = ref([]);
+const importingErrorMessages = ref<Array<string>>([]);
 const supportedExtensions = ['txt', 'json'];
 
-async function readFile(file) {
+async function readFile(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
         let content = '';
 
         reader.onload = (event) => {
+            if (event.target == null) {
+                return;
+            }
+
             content += event.target.result;
         };
 
-        reader.onloadend = (event) => {
+        reader.onloadend = () => {
             resolve(content);
         };
 
@@ -29,12 +35,22 @@ async function readFile(file) {
     });
 }
 
-function getFileExtension(file) {
-    return file.name.split('.').at(-1).toLowerCase();
+function getFileExtension(file: File): string {
+    const last = file.name.split('.').at(-1);
+
+    if (last == null) {
+        return '';
+    }
+
+    return last.toLowerCase();
 }
 
-async function processFile(event) {
+async function processFile(event: DragEvent): Promise<void> {
     importingErrorMessages.value = [];
+
+    if (event.dataTransfer == null) {
+        return;
+    }
 
     const { files } = event.dataTransfer;
 
@@ -47,19 +63,31 @@ async function processFile(event) {
     const extension = getFileExtension(file);
 
     if (!supportedExtensions.includes(extension)) {
-        importingErrorMessages.value = [`Unsupported extension ${extension}`, `Only supported ${supportedExtension.join(', ')}`];
+        importingErrorMessages.value = [
+            `Unsupported extension ${extension}`,
+            `Only supported ${supportedExtensions.join(', ')}`
+        ];
+
         return;
     }
 
+    readCharacters(file).then((characters: Characters) => {
+        emit('importedCharacters', characters);
+    }).catch((error: Error) => {
+        importingErrorMessages.value = [error.message];
+    });
+}
+
+async function readCharacters(file: File): Promise<Characters> {
     let content;
 
     try {
         content = await readFile(file);
     } catch (error) {
-        console.error(error);
-        importingErrorMessages.value = [`Could not read file ${file.name}`];
-        return;
+        throw new Error(`Could not read file ${file.name}`, { cause: error });
     }
+
+    const extension = getFileExtension(file);
 
     let importedCharacters;
 
@@ -75,21 +103,19 @@ async function processFile(event) {
             default:
         }
     } catch (error) {
-        console.error(error);
-        importingErrorMessages.value = [`Could not process the file ${file.name}`, error.message];
+        throw new Error(`Could not process the file ${file.name}`, { cause: error });
     }
 
     if (!importedCharacters) {
-        return;
+        throw new Error(`No characters found in file`);
     }
 
-    emit('importedCharacters', importedCharacters);
+    return importedCharacters;
 }
 </script>
 
 <template>
-    <div
-        class="import-drop-zone"
+    <raider-import-drop-zone
         draggable
         @drop.prevent="processFile"
         @dragstart.prevent
@@ -107,11 +133,11 @@ async function processFile(event) {
                 {{ importingErrorMessage }}
             </p>
         </div>
-    </div>
+    </raider-import-drop-zone>
 </template>
 
-<style>
-.import-drop-zone {
+<style lang="scss">
+raider-import-drop-zone {
     min-width: 300px;
     border: 4px dashed;
     border-radius: 12px;
@@ -119,9 +145,9 @@ async function processFile(event) {
     display: grid;
     place-items: center;
     padding: 1em;
-}
 
-.import-drop-zone:hover {
-    background-color: rgba(0, 0, 0, 0.4);
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.4);
+    }
 }
 </style>
