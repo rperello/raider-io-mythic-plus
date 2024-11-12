@@ -1,6 +1,5 @@
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 24px;
   font-weight: 400;
 
@@ -94,10 +93,6 @@ input:focus-visible {
   outline: 1px auto orangered;
 }
 
-.card {
-  padding: 2em;
-}
-
 #app {
   max-width: 1280px;
   margin: 0 auto;
@@ -111,43 +106,12 @@ main {
   overflow-x: auto;
 }
 
-table {
-  box-shadow: 0 0 40px #ff450084;
-  color: white;
-  margin-top: 1em;
-}
-
-table thead {
-  font-size: 12px;
-}
-
-table td, table th {
-  padding: 8px 14px;
-}
-
-table th {
-  background-color: #313131;
-}
-
-table td {
-  background-color: #1a1a1a;
-}
-
-table td {
-  vertical-align: middle;
-}
-
 .text-left {
   text-align: left;
 }
 
 .my-shadow {
   box-shadow: 0 40px 60px rgba(255, 255, 255, 0.1);
-}
-
-td.transparent-background {
-  background-color: transparent;
-  padding: 0;
 }
 
 .orange-glow {

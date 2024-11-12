@@ -1,19 +1,15 @@
 export class Persistence {
-    getItem(key, defaultValue) {
+    public getItem<T>(key: string, defaultValue: T): T {
         const textValue = localStorage.getItem(key);
 
         if (textValue == null) {
             return defaultValue;
         }
 
-        try {
-            return JSON.parse(textValue);
-        } catch (error) {
-            return textValue ?? defaultValue;
-        }
+        return JSON.parse(textValue);
     }
 
-    setItem(key, value) {
+    public setItem(key: string, value: unknown): void {
         const textValue = JSON.stringify(value);
     
         localStorage.setItem(key, textValue);
